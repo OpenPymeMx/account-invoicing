@@ -23,6 +23,7 @@ from openerp.osv import orm
 from openerp import netsvc
 from openerp.osv.orm import browse_record, browse_null
 
+from openerp.addons.account import signals
 
 class account_invoice(orm.Model):
     _inherit = "account.invoice"
@@ -182,8 +183,9 @@ class account_invoice(orm.Model):
             for old_id in old_ids:
                 wf_service.trg_redirect(
                     uid, 'account.invoice', old_id, newinvoice_id, cr)
-                wf_service.trg_validate(
-                    uid, 'account.invoice', old_id, 'invoice_cancel', cr)
+                signals.invoice_cancel.send(
+                    self, cr=cr, uid=uid, ids=ids, context=context
+                )
         # make link between original sale order or purchase order
         so_obj = self.pool.get('sale.order')  # None if sale is not installed
         order_line_obj = self.pool.get('sale.order.line')
