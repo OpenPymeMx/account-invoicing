@@ -90,11 +90,13 @@ class account_invoice(orm.Model):
                 if field in ('product_id', 'account_id'):
                     if not field_val:
                         field_val = False
-                if isinstance(field_val, browse_record):
+                if (isinstance(field_val, browse_record) and
+                   field != 'invoice_line_tax_id'):
                     field_val = field_val.id
                 elif isinstance(field_val, browse_null):
                     field_val = False
-                elif isinstance(field_val, list):
+                elif (isinstance(field_val, list) or
+                      field == 'invoice_line_tax_id'):
                     field_val = ((6, 0, tuple([v.id for v in field_val])),)
                 list_key.append((field, field_val))
             list_key.sort()
